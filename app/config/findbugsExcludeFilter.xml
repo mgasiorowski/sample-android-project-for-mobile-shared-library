@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <!--Exclude Android generated sources-->
+        <Or>
+            <Class name="~.*\.R\$.*"/>
+            <Class name="~.*Manifest\$.*"/>
+        </Or>
+    </Match>
+    <Match>
+        <!--Exclude test classes-->
+        <Class name="~.*Test.*"/>
+    </Match>
+    <Match>
+        <!--DbFlow generated tables-->
+        <Class name="~.*_Table.*"/>
+    </Match>
+    <Match>
+        <Or>
+            <!--TODO Our models expose mutable Date classes, it can be ignored or pointed out for further protection-->
+            <Bug code="EI,EI2"/>
+            <!--Kotlin handles null pointers very effectively-->
+            <Bug code="NP"/>
+            <!--Done by Lint and kotlin type check-->
+            <Bug code="RCN"/>
+        </Or>
+    </Match>
+    <Match>
+        <Or>
+            <!--Kotlin smart casts are doing this job-->
+            <Bug pattern="BC_BAD_CAST_TO_ABSTRACT_COLLECTION"/>
+            <!--Connected with Kotlin objects and inheritance-->
+            <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+            <!--Infix functions "and" and "or" are reported by this-->
+            <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT"/>
+        </Or>
+    </Match>
+</FindBugsFilter>

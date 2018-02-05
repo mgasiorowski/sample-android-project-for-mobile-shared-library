@@ -1,0 +1,77 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'findbugs'
+
+def getVersionCode = { ->
+
+    def code = project.hasProperty('versionCode') ? versionCode.toInteger() : 1
+    println "VersionCode is set to $code"
+    return code
+}
+
+android {
+    signingConfigs {
+        debug {
+            storeFile file('keystoreDebug')
+            storePassword 'keystoreDebug'
+            keyAlias 'keystoreDebug'
+            keyPassword 'keystoreDebug'
+        }
+
+    }
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "io.jenkins.mobilepipelinesampleproject.sampleprojectformobilesharedlibraryci"
+        minSdkVersion 23
+        targetSdkVersion 26
+        versionCode getVersionCode()
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            versionNameSuffix project.hasProperty('buildTypeSuffix') as String ?: '-debug'
+
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4.1'
+}
+
+task findbugs(type: FindBugs) {
+    description 'Run findbugs'
+    group 'verification'
+    classes = fileTree(dir: 'build/intermediates/classes/')
+    source = fileTree('src/main/java/')
+    classpath = files()
+    effort = 'max'
+    ignoreFailures = true
+}
+// Filters for FindBugs
+tasks.withType(FindBugs) {
+    excludeFilter = file("config/findbugsExcludeFilter.xml")
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:design:26.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
